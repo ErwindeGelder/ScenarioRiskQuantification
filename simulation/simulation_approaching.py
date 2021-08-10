@@ -53,6 +53,7 @@ def acc_idm_approaching_pars(**kwargs):
     for parm in ["k1_acc", "k2_acc"]:
         if parm in kwargs:
             parms[parm] = kwargs[parm]
+    parms["driver_takeover_view"] = kwargs["max_view"] if "max_view" in kwargs else 150
     if "reactiontime" not in kwargs:
         kwargs["reactiontime"] = np.random.lognormal(np.log(.92**2/np.sqrt(.92**2+.28**2)),
                                                      np.sqrt(np.log(1+.28**2/.92**2)))
@@ -98,8 +99,6 @@ def idm_approaching_pars(i=1, **kwargs):
                          n_reaction=int(reactiontime/steptime),
                          thw=thw,
                          safety_distance=safety_distance,
-                         a_acc=1,
-                         b_acc=1.5,
                          **parms)
 
 
@@ -114,8 +113,7 @@ class SimulationApproaching(SimulationString):
     def _leader_parameters(**kwargs):
         """ Return the paramters for the leading vehicle. """
         if "init_position" not in kwargs:
-            init_position = kwargs["vego"]*(1-kwargs["ratio_vtar_vego"]) * 4  # At least at TTC=4s
-            init_position += kwargs["vego"] * 1  # At least at THW of 1 s.
+            init_position = kwargs["vego"] * 4  # At least at THW of 4 s. Therefore, also TTC>4s.
         else:
             init_position = kwargs["init_position"]
         return LeaderBrakingParameters(init_position=init_position,
