@@ -68,10 +68,6 @@ class ACCIDMPlus(ACC):
         # Initialize parameters of the Forward Collision Warning
         self.parms.fcw_delay, self.parms.fcw_threshold = parms.fcw_delay, parms.fcw_threshold
 
-        # Ensure that take over view is not larger than driver view
-        if self.parms.driver_takeover_view > self.parms.driver_model.parms.max_view:
-            self.parms.driver_takeover_view = self.parms.driver_model.parms.max_view
-
         # Reset the state regarding the takeover.
         self.state.fcw = False
         self.state.samples_since_fcw = 0
@@ -104,9 +100,11 @@ class ACCIDMPlus(ACC):
         # Following Xiao et al. (2017), the driver takes over if approaching speed > 15 m/s and
         # car is within 150 m. The speed (15 m/s) and view (150 m) are parameterized with
         # `driver_take_over_speed`, `driver_take_over_view`.
+        # As a additional requirement, the driver should brake.
         if not self.state.driver_takeover:
-            if self.state.speed - leader.state.speed > self.parms.driver_takeover_speed and \
-                    (leader.state.position - self.state.position) < self.parms.driver_takeover_view:
+            if self.state.speed-leader.state.speed > self.parms.driver_takeover_speed and \
+                (leader.state.position-self.state.position) < self.parms.driver_takeover_view and \
+                    self.parms.driver_model.state.acceleration < 0:
                 self.state.driver_takeover = True
 
         if self.state.driver_takeover:
