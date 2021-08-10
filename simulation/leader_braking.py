@@ -18,7 +18,7 @@ class LeaderBrakingParameters(Options):
     speed_difference: float = 1
     average_deceleration: float = 1
     duration: float = None
-    tconst: float = 5
+    tconst: float = 0
 
 
 class LeaderBrakingState(Options):
