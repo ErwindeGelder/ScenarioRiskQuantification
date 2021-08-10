@@ -48,8 +48,6 @@ def idm_lead_braking_pars(**kwargs):
                          n_reaction=int(reactiontime/steptime),
                          thw=thw,
                          safety_distance=safety_distance,
-                         a_acc=1,
-                         b_acc=1.5,
                          **parms)
 
 
@@ -125,7 +123,7 @@ class SimulationLeadBraking(SimulationString):
                                        init_speed=kwargs["v0"],
                                        average_deceleration=kwargs["amean"],
                                        speed_difference=kwargs["dv"],
-                                       tconst=5)
+                                       tconst=0)
 
     def init_simulation(self, **kwargs) -> None:
         """ Initialize the simulation.
