@@ -7,7 +7,7 @@ Modifications:
 2020 12 11: Return negative impact speed in case of a collision.
 """
 
-from typing import Callable, List
+from typing import Callable, List, Tuple, Union
 import matplotlib.pyplot as plt
 import numpy as np
 from .simulator import Simulator
@@ -19,22 +19,30 @@ class SimulationString(Simulator):
     Attributes:
         vehicles - list of vehicles
         parameters - list of functions for obtaining the parameters
+        comparison_simulator - simulator used for comparison
+        comparison_func - function used to compare simulation results
     """
-    def __init__(self, vehicles: List, parameter_functions: List[Callable], **kwargs):
+    def __init__(self, vehicles: List, parameter_functions: List[Callable],
+                 comparison_simulator=None, comparison_func=None, **kwargs):
         # Instantiate the vehicles.
         self.vehicles = vehicles
         self.parameter_functions = parameter_functions
+        self.comparison_simulator = comparison_simulator
+        self.comparison_func = comparison_func
         Simulator.__init__(self, **kwargs)
 
-    def simulation(self, parameters: dict, plot: bool = False, ignore_stop: List[bool] = None,
-                   seed: int = None) -> np.ndarray:
+    def simulation(self, parameters: dict, plot: bool = False, return_data: bool = False,
+                   ignore_stop: List[bool] = None, seed: int = None) -> \
+            Union[np.ndarray, Tuple[np.ndarray, np.ndarray]]:
         """ Run a single simulation.
 
         :param parameters: specific parameters for the scenario.
         :param plot: Whether to make a plot or not.
+        :param return_data: Whether to return data (makes simulation slower).
         :param ignore_stop: Whether to ignore stopping criterium for a vehicle.
         :param seed: Specify in order to simulate with a fixed seed.
-        :return: The minimum distance (negative means collision).
+        :return: The minimum distance (negative means collision) and (if
+            return_data=True) data from the simulation.
         """
         if seed is not None:
             np.random.seed(seed)
@@ -75,7 +83,7 @@ class SimulationString(Simulator):
             for leader, follower in zip(self.vehicles[:-1], self.vehicles[1:]):
                 follower.step_simulation(leader)
 
-            if plot:
+            if plot or return_data:
                 data.append([[vehicle.state.position, vehicle.state.speed,
                               vehicle.state.acceleration] for vehicle in self.vehicles])
 
@@ -108,8 +116,22 @@ class SimulationString(Simulator):
             ax4.legend()
             plt.tight_layout()
 
-        return np.array([minttcs[i] if mindistances[i] > 0 else -impact_speeds[i]
-                         for i in range(len(self.vehicles)-1)])
+        main_result = np.array([minttcs[i] if mindistances[i] > 0 else -impact_speeds[i]
+                                for i in range(len(self.vehicles)-1)])
+        if return_data:
+            return main_result, np.array(data)
+        return main_result
+
+    def comparison(self, parameters: dict, **kwargs):
+        """ Compare the current simulation with the simulation of comparison
+
+        Just provide this function with the arguments that would be provided to
+        the simulation funciton.
+        """
+        kwargs.update(dict(return_data=True))
+        main_result, data_main = self.simulation(parameters, **kwargs)
+        _, data_comparison = self.comparison_simulator.simulation(parameters, **kwargs)
+        return data_main, data_comparison
 
     def init_simulation(self, **kwargs) -> None:
         """ Initialize the simulation.
