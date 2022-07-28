@@ -28,7 +28,7 @@ def acc_approaching_pars(**kwargs):
     :return: Parameter object that can be passed via init_simulation.
     """
     parms = dict()
-    for parm in ["amin", "sensor_range"]:
+    for parm in ["amin", "sensor_range", "k1_acc", "k2_acc", "k_cruise"]:
         if parm in kwargs:
             parms[parm] = kwargs[parm]
     return ACCParameters(speed=kwargs["vego"],
