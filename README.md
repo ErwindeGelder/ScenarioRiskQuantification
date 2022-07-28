@@ -4,8 +4,8 @@ This repository contains the Python implementation of a scenario-based risk quan
 
 E. de Gelder, H. Elrofai, A. Khabbaz Saberi, J.-P. Paardekooper, O. Op den Camp, and B. De Schutter, 
 "Risk Quantification for Automated Driving Systems in Driving Scenarios",
-2021,
-*In preparation*.
+in *IEEE Access*, vol. 9, pp. 168953-168970, 2021,
+doi: [10.1109/ACCESS.2021.3136585](https://doi.org/10.1109/ACCESS.2021.3136585).
 
 # Running the code
 
