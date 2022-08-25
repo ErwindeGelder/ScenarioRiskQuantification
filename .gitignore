@@ -3,4 +3,5 @@
 __pycache__/
 */__pycache__/
 data/simulation_results/
+data/uncertainty_results/
 *.p
